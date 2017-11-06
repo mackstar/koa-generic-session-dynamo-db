@@ -1,0 +1,26 @@
+{
+  "name": "koa-generic-session-dynamodb",
+  "version": "0.0.1",
+  "description": "\"DynamoDB store for for koa-generic-session middleware.\"",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "koa",
+    "session",
+    "dynamodb",
+    "store"
+  ],
+  "author": "Richard McIntyre <richard.mackstar@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.145.0"
+  }
+}
