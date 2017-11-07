@@ -4,7 +4,7 @@
   "description": "\"DynamoDB store for for koa-generic-session middleware.\"",
   "main": "src/index.js",
   "scripts": {
-    "test": "test"
+    "test": "node_modules/.bin/mocha ./tests/index.js"
   },
   "keywords": [
     "koa",
@@ -15,11 +15,19 @@
   "author": "Richard McIntyre <richard.mackstar@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
     "babel-plugin-rewire": "^1.1.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
     "eslint": "^4.10.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "mocha": "^4.0.1"
+    "mocha": "^4.0.1",
+    "sinon": "^4.1.2",
+    "sinon-chai": "^2.14.0"
   },
   "dependencies": {
     "aws-sdk": "^2.145.0"

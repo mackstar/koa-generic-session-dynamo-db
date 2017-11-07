@@ -4,13 +4,15 @@ import { EventEmitter } from 'events';
 export default class DynamoDBStore extends EventEmitter {
   constructor(options = {}) {
     super();
-    const {
-      credentials,
-      region,
-      tableName = 'Session',
-      key = 'Id', 
+    let {
       client,
+      key = 'Id',
+      tableName = 'Session',
+      credentials,
+      region = 'usa'
     } = options;
+
+    console.log(AWS.DocumentClient);
 
     if (!client) {
       client = new AWS.DynamoDB({ credentials, region }).DocumentClient();
