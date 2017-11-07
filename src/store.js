@@ -13,34 +13,50 @@ export default class DynamoDBStore extends EventEmitter {
     } = options;
 
     if (!client) {
-      client = new AWS.DynamoDB({ credentials, region });
+      client = new AWS.DynamoDB({ credentials, region }).DocumentClient();
     }
     this.client = client;
     this.Key = key;
     this.TableName = tableName;
-
   }
 
-  async get(id) {
+  getParamsForId(id) {
     const { TableName, Key } = this;
-    const params = {
+    return {
       Key: {
-        [Key]: {
-          S: id,
-        },
+        [Key]: id,
       },
       TableName,
     };
-    try {
-      const record = await this.client.getItem(params).promise();
-    } catch (err) {
+  }
 
+  async get(id) {
+    const params = this.getParamsForId(id);
+    try {
+      return await this.client.get(params).promise();
+    } catch (err) {
+      return null;
     }
   }
 
-  async set(sid, sess, ttl) {
-
+  async set(id, session, ttl) {
+    const { TableName, Key } = this;
+    const Items = session;
+    Items[Key] = id;
+    const params = { TableName, Items };
+    try {
+      return await this.client.put(params).promise();
+    } catch (err) {
+      return null;
+    }
   }
 
-  
+  async destroy(id) {
+    const params = this.getParamsForId(id);
+    try {
+      return await this.client.delete(params).promise();
+    } catch (err) {
+      return null;
+    }
+  }
 }
