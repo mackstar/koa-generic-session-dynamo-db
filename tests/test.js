@@ -1,6 +1,9 @@
 import sinon from 'sinon';
+import AWS from 'aws-sdk';
+import DocumentClient from 'aws-sdk/lib/dynamodb/document_client';
 
 import Store from '../src/store';
+import DynamoDBMock from './utilities/DynamoDBMock';
 
 describe('DynamoDB session store', () => {
 
@@ -8,22 +11,19 @@ describe('DynamoDB session store', () => {
   let aws;
 
   beforeEach(() => {
-    let DynamoDB = sinon.spy(() => sinon.createStubInstance(DynamoDB));
-    DynamoDB.DocumentClient = 
-    aws = {
-      DynamoDB
-    }
-    Store.__Rewire__('AWS', { DynamoDB });
-    
+    sinon.stub(DynamoDBMock.prototype, 'DocumentClient').callsFake(() => ({
+      get: sinon.spy(),
+    }));
+    aws = { DynamoDB: DynamoDBMock };
+    Store.__Rewire__('AWS', { DynamoDB: DynamoDBMock });
   });
 
   it('should set up aws with credentials when supplied', () => {
     const store = new Store({ credentials: 'credentials' });
-    store();
     aws.DynamoDB.should.have.been.calledWithNew();
   });
   it('should be able to add a session', () => {
-    
+
   });
   it('should be able to get a session', () => {
     

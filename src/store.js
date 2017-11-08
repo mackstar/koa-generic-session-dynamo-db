@@ -12,9 +12,12 @@ export default class DynamoDBStore extends EventEmitter {
       region = 'usa'
     } = options;
 
-    console.log(AWS.DocumentClient);
 
     if (!client) {
+      console.log("Dynamo DB instance");
+      console.log(new AWS.DynamoDB({ credentials, region }));
+      console.log("Document client");
+      console.log(new AWS.DynamoDB({ credentials, region }).DocumentClient().get);
       client = new AWS.DynamoDB({ credentials, region }).DocumentClient();
     }
     this.client = client;

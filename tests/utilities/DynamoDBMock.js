@@ -1,18 +1,13 @@
-class DynamoDB {
+export default class DynamoDB {
   constructor(options = {}) {
     this.options = options;
   }
 
   DocumentClient() {
     return {
-      get: (item) => {
-
-      }
+      get: () => {},
+      post: () => {},
     }
   }
   
 }
-
-export default {
-  
-};
