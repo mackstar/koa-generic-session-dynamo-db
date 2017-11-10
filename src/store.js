@@ -20,7 +20,7 @@ export default class DynamoDBStore extends EventEmitter {
       connection = new AWS.DynamoDB({ credentials, region });
     }
 
-    const client = connection.DocumentClient();
+    const client = new AWS.DynamoDB.DocumentClient({ service: connection });
     Object.assign(this, {
       key,
       tableName,
@@ -113,8 +113,8 @@ export default class DynamoDBStore extends EventEmitter {
   async set(id, session, ttl) {
     const { TableName, key, ttlKey } = this;
     const maxAge = (session.cookie && session.cookie.maxAge) ? session.cookie.maxAge : null;
-
     const Items = session;
+
     Items[key] = id;
     Items[ttlKey] = new Date((ttl || maxAge || ONE_DAY) + Date.now());
     const params = { TableName, Items };
