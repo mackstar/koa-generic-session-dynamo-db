@@ -7,25 +7,24 @@ export default class DynamoDBStore extends EventEmitter {
   constructor(options = {}) {
     super();
 
-    let { connection } = options;
+    let { service } = options;
     const {
       key = 'Id',
       tableName = 'Session',
-      credentials,
-      region = 'usa',
+      params,
       ttlKey = 'Ttl',
     } = options;
 
-    if (!connection) {
-      connection = new AWS.DynamoDB({ credentials, region });
+    if (service) {
+      service = new AWS.DynamoDB(params);
     }
 
-    const client = new AWS.DynamoDB.DocumentClient({ service: connection });
+    const documentClient = new AWS.DynamoDB.DocumentClient({ service });
     Object.assign(this, {
       key,
       tableName,
-      client,
-      connection,
+      documentClient,
+      service,
       ttlKey,
     });
     this.createTable();
@@ -33,7 +32,7 @@ export default class DynamoDBStore extends EventEmitter {
 
   async doesTableExist() {
     try {
-      return await this.connection.listTables({ limit: 0 }).promise()
+      return await this.service.listTables({ limit: 0 }).promise()
         .then(result => result.data.TableNames.indexOf(this.TableName) !== -1);
     } catch (err) {
       throw err;
@@ -67,7 +66,7 @@ export default class DynamoDBStore extends EventEmitter {
     };
 
     try {
-      await this.connection.createTable(params).promise();
+      await this.service.createTable(params).promise();
       await this.setTtlField().promise();
       return true;
     } catch (err) {
@@ -85,7 +84,7 @@ export default class DynamoDBStore extends EventEmitter {
       },
     };
     try {
-      await this.connection.updateTimeToLive(params).promise();
+      await this.service.updateTimeToLive(params).promise();
     } catch (err) {
       throw new Error('Error setting TTL');
     }
@@ -104,7 +103,7 @@ export default class DynamoDBStore extends EventEmitter {
   async get(id) {
     const params = this.getParamsForId(id);
     try {
-      return await this.client.get(params).promise();
+      return await this.documentClient.get(params).promise();
     } catch (err) {
       throw new Error('Unable to get session.');
     }
@@ -119,7 +118,7 @@ export default class DynamoDBStore extends EventEmitter {
     Items[ttlKey] = new Date((ttl || maxAge || ONE_DAY) + Date.now());
     const params = { TableName, Items };
     try {
-      return await this.client.put(params).promise();
+      return await this.documentClient.put(params).promise();
     } catch (err) {
       throw new Error('Unable to set session.');
     }
@@ -128,7 +127,7 @@ export default class DynamoDBStore extends EventEmitter {
   async destroy(id) {
     const params = this.getParamsForId(id);
     try {
-      return await this.client.delete(params).promise();
+      return await this.documentClient.delete(params).promise();
     } catch (err) {
       throw new Error('Unable to delete session.');
     }
