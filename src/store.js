@@ -120,7 +120,7 @@ export default class DynamoDBStore extends EventEmitter {
     const Item = session;
 
     Item[key] = id;
-    Item[ttlKey] = new Date((ttl || maxAge || ONE_DAY) + Date.now());
+    Item[ttlKey] = (new Date((ttl || maxAge || ONE_DAY) + Date.now())).getTime() / 1000;
     const params = { TableName, Item };
 
     try {
