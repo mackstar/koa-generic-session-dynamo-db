@@ -13,9 +13,11 @@ export default class DynamoDBStore extends EventEmitter {
       tableName = 'Session',
       params,
       ttlKey = 'Ttl',
+      readCapacityUnits = 5,
+      writeCapacityUnits = 5,
     } = options;
 
-    if (service) {
+    if (!service) {
       service = new AWS.DynamoDB(params);
     }
 
@@ -26,14 +28,16 @@ export default class DynamoDBStore extends EventEmitter {
       documentClient,
       service,
       ttlKey,
+      readCapacityUnits,
+      writeCapacityUnits,
     });
     this.createTable();
   }
 
   async doesTableExist() {
     try {
-      return await this.service.listTables({ limit: 0 }).promise()
-        .then(result => result.data.TableNames.indexOf(this.TableName) !== -1);
+      return await this.service.listTables().promise()
+        .then(result => (result.TableNames.indexOf(this.tableName) !== -1));
     } catch (err) {
       throw err;
     }
@@ -47,8 +51,8 @@ export default class DynamoDBStore extends EventEmitter {
     const {
       tableName: TableName,
       key: AttributeName,
-      readCapacityUnits,
-      writeCapacityUnits,
+      readCapacityUnits: ReadCapacityUnits,
+      writeCapacityUnits: WriteCapacityUnits,
     } = this;
 
     const params = {
@@ -60,8 +64,8 @@ export default class DynamoDBStore extends EventEmitter {
         { AttributeName, AttributeType: 'S' },
       ],
       ProvisionedThroughput: {
-        ReadCapacityUnits: readCapacityUnits,
-        WriteCapacityUnits: writeCapacityUnits,
+        ReadCapacityUnits,
+        WriteCapacityUnits,
       },
     };
 
@@ -91,7 +95,7 @@ export default class DynamoDBStore extends EventEmitter {
   }
 
   getParamsForId(id) {
-    const { TableName, key } = this;
+    const { tableName: TableName, key } = this;
     return {
       Key: {
         [key]: id,
@@ -103,20 +107,22 @@ export default class DynamoDBStore extends EventEmitter {
   async get(id) {
     const params = this.getParamsForId(id);
     try {
-      return await this.documentClient.get(params).promise();
+      return await this.documentClient.get(params).promise()
+        .then(result => result.Item);
     } catch (err) {
       throw new Error('Unable to get session.');
     }
   }
 
   async set(id, session, ttl) {
-    const { TableName, key, ttlKey } = this;
+    const { tableName: TableName, key, ttlKey } = this;
     const maxAge = (session.cookie && session.cookie.maxAge) ? session.cookie.maxAge : null;
-    const Items = session;
+    const Item = session;
 
-    Items[key] = id;
-    Items[ttlKey] = new Date((ttl || maxAge || ONE_DAY) + Date.now());
-    const params = { TableName, Items };
+    Item[key] = id;
+    Item[ttlKey] = new Date((ttl || maxAge || ONE_DAY) + Date.now());
+    const params = { TableName, Item };
+
     try {
       return await this.documentClient.put(params).promise();
     } catch (err) {

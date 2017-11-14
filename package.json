@@ -2,7 +2,7 @@
   "name": "koa-generic-session-dynamodb",
   "version": "0.0.1",
   "description": "\"DynamoDB store for for koa-generic-session middleware.\"",
-  "main": "src/index.js",
+  "main": "src/store.js",
   "scripts": {
     "test": "node_modules/.bin/mocha ./tests/index.js"
   },
