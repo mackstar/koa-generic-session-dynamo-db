@@ -1,0 +1,14 @@
+{
+    "extends": "airbnb-base",
+    "globals": {
+        "describe": true,
+        "it": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "before": true,
+        "after": true
+    },
+    "rules": {
+        "no-underscore-dangle": ["error",  { "allow": ["__Rewire__", "__ResetDependency__"] }]
+    }
+}

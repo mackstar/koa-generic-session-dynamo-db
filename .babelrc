@@ -1,0 +1,4 @@
+{
+  "presets": ["env"],
+  "plugins": ["rewire", "transform-async-to-generator"]
+}
